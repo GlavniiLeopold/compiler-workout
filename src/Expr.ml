@@ -59,7 +59,7 @@ let eval = failwith "Not implemented yet"
 *)
 
 let rec eval_ex op x y = 
-    let toInt x = 
+    let toBool x = 
 		if x = 0 then false else true
     and toInt op_bool x y =
 		if op_bool x y then 1 else 0
