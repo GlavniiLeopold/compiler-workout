@@ -21,8 +21,8 @@ type config = int list * Syntax.Stmt.config
 
      val eval : config -> prg -> config
 
-   Takes a configuration and a program, and returns a configuration as a result
- *)                                                
+   Takes a configuration and a program, and returns a configuration as a result *)  
+ 
 let rec eval config prg = 
     let update_config inst ((st, (s, i, o)) : config) = 
         match inst with
@@ -41,15 +41,29 @@ let rec eval config prg =
 
 (* Top-level evaluation
      val run : int list -> prg -> int list
-   Takes an input stream, a program, and returns an output stream this program calculates
-*)
+   Takes an input stream, a program, and returns an output stream this program calculates *)
+
 let run i p = let (_, (_, _, o)) = eval ([], (Syntax.Expr.empty, i, [])) p in o
+
 (* Stack machine compiler
 
      val compile : Syntax.Stmt.t -> prg
 
    Takes a program in the source language and returns an equivalent program for the
-   stack machine
- *)
+   stack machine *)
 
-let compile _ = failwith "Not yet implemented"
+let rec compile (stmt : Syntax.Stmt.t) =
+  let rec compile_expr (expr : Syntax.Expr.t) = 
+    match expr with
+    Const (n) -> [CONST n]
+    | Var (x) -> [LD x]
+    | Binop (binop, x, y) -> 
+    let eval_x = compile_expr x
+    and eval_y = compile_expr y in
+    eval_x @ eval_y @ [BINOP binop] in
+    match stmt with
+    Read (x) -> READ :: [ST x]
+    | Write (expr) -> (compile_expr expr) @ [WRITE]
+    | Assign (x, expr) -> (compile_expr expr) @ [ST x]
+    | Seq (stmt_left, stmt_right) -> (compile stmt_left) @ (compile stmt_right);;
+
