@@ -22,17 +22,28 @@ type config = int list * Syntax.Stmt.config
      val eval : config -> prg -> config
 
    Takes a configuration and a program, and returns a configuration as a result
- *)                         
-let eval _ = failwith "Not yet implemented"
+ *)                                                
+let rec eval config prg = 
+    let update_config inst ((st, (s, i, o)) : config) = 
+        match inst with
+        BINOP (binop) -> 
+        (match st with 
+        y :: x :: st_end -> ((Syntax.Expr.calc binop x y) :: st_end, (s, i ,o)) 
+        | _ -> failwith "Insufficient arguments")
+        | CONST (n) -> (n :: st, (s, i, o))
+        | READ -> let num = List.hd i in (num :: st, (s, List.tl i, o))
+        | WRITE -> let num = List.hd st in (List.tl st, (s, i, o @ [num]))
+        | LD (x) -> ((s x) :: st, (s, i, o))
+        | ST (x) -> let num = List.hd st in (List.tl st, (Syntax.Expr.update x num s, i, o)) in
+        match prg with
+        [] -> config    
+        | inst :: tail -> eval (update_config inst config) tail;;
 
 (* Top-level evaluation
-
      val run : int list -> prg -> int list
-
    Takes an input stream, a program, and returns an output stream this program calculates
 *)
 let run i p = let (_, (_, _, o)) = eval ([], (Syntax.Expr.empty, i, [])) p in o
-
 (* Stack machine compiler
 
      val compile : Syntax.Stmt.t -> prg
