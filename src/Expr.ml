@@ -55,14 +55,11 @@ let _ =
    the given state.
 *)
 (*
-let eval = failwith "Not implemented yet"
-*)
+let eval = failwith "Not implemented yet" *)
 
 let rec eval_ex op x y = 
-    let toBool x = 
-		if x = 0 then false else true
-    and toInt op_bool x y =
-		if op_bool x y then 1 else 0
+    let to_bool x = if x = 0 then false else true
+    and to_int op_bool x y = if op_bool x y then 1 else 0
     in
     match op with
     | "+" -> x + y
@@ -70,21 +67,21 @@ let rec eval_ex op x y =
     | "*" -> x * y
     | "/" -> x / y
     | "%" -> x mod y
-    | "<" -> toInt (<) x y
-    | "<=" -> toInt (<=) x y
-    | ">" -> toInt (>) x y
-    | ">=" -> toInt (>=) x y
-    | "==" -> toInt (==) x y
-    | "!=" -> toInt (<>) x y
-    | "&&" -> toInt (&&) (toBool x) (toBool y)
-    | "!!" -> toInt (||) (toBool x) (toBool y)
+    | "<" -> to_int (<) x y
+    | "<=" -> to_int (<=) x y
+    | ">" -> to_int (>) x y
+    | ">=" -> to_int (>=) x y
+    | "==" -> to_int (==) x y
+    | "!=" -> to_int (<>) x y
+    | "&&" -> to_int (&&) (to_bool x) (to_bool y)
+    | "!!" -> to_int (||) (to_bool x) (to_bool y)
 
 let rec eval st ex = 
     match ex with
     | Const (value) -> value
     | Var (value) -> st value
     | Binop (oper, ex1, ex2) ->
-    let val1 = eval st ex1 
-    and val2 = eval st ex2 
-    in eval_ex op val1 val2
+    let value1 = eval st ex1 
+    and value2 = eval st ex2 
+    in eval_ex op value1 value2
                     
